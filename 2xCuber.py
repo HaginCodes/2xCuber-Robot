@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from ev3dev2.motor import LargeMotor, MediumMotor, OUTPUT_A, OUTPUT_B, OUTPUT_C, SpeedDPS
+from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_D, SpeedDPS
 from pprint import pformat
 from subprocess import check_output
 from time import sleep
@@ -15,15 +15,15 @@ log = logging.getLogger(__name__)
 
 class Cuber2x(object):
     
-    hold_cube_pos = 85 #arbitrary need to find
+    hold_cube_pos = 200 #arbitrary need to find
     rotate_speed = 400 #adapt
     flip_speed = 300 #adapt (might need to be slower)
 
 
     def __init__(self):
         self.shutdown = False
-        self.rotator = LargeMotor(OUTPUT_A)
-        self.turntable = LargeMotor(OUTPUT_B)
+        self.rotator = LargeMotor(OUTPUT_D)
+        self.turntable = LargeMotor(OUTPUT_A)
         
         self.init_motors()
         self.state = ['U','L','F','R','B','D']
@@ -39,7 +39,7 @@ class Cuber2x(object):
             x.reset()
 
         log.info("Initialize rotator %s" % self.rotator)
-        self.rotator.on(SpeedDPS(-50), block=False)
+        #self.rotator.on(SpeedDPS(-50), block=True)
         self.rotator.off()
         self.rotator.reset()
 
@@ -130,7 +130,6 @@ class Cuber2x(object):
             current_position >= Cuber2x.hold_cube_pos + 10):
     
             self.rotator.ramp_down_sp=400
-            self.rotator.on() 
             self.rotator.on_to_position(SpeedDPS(speed), Cuber2x.hold_cube_pos)
             log.info("rotated on to position")
             sleep(0.05)
@@ -222,7 +221,6 @@ class Cuber2x(object):
 
 
 if __name__== '__main__':
-
    
     logging.basicConfig(level=logging.INFO,format='%(asctime)s %(filename)12s %(levelname)8s: %(message)s')
     log = logging.getLogger(__name__)
@@ -236,10 +234,11 @@ if __name__== '__main__':
 
     try:
         
-        x2Cube.rotator_hold_cube(100)
-        x2Cube.rotator_away(100)
+        #x2Cube.rotator_hold_cube(150)
+        x2Cube.rotate_cube(-1,1)
+        #x2Cube.rotator_away(150)
 
-        x2Cube.scan()
+        #x2Cube.scan()
         x2Cube.shutdown_robot()
 
     

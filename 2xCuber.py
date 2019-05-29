@@ -68,7 +68,7 @@ class Cuber2x(object):
 
     def rotate_cube(self, direction, nb):
         current_pos = self.turntable.position
-        final_pos = 135 * round((self.turntable.position + (270 * direction * nb)) /135.0)
+        final_pos = 150 * round((self.turntable.position + (395 * direction * nb)) /150.0)
         log.info("rotate_cube() direction %s, nb %s, current_pos %d final_pos %d" % (direction , nb, current_pos, final_pos))
 
         if self.rotator.position > 35:
@@ -235,7 +235,8 @@ if __name__== '__main__':
     try:
         
         #x2Cube.rotator_hold_cube(150)
-        x2Cube.rotate_cube(-1,1)
+        x2Cube.rotate_cube_1()
+        x2Cube.rotate_cube_3()
         #x2Cube.rotator_away(150)
 
         #x2Cube.scan()

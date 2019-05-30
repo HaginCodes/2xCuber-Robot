@@ -154,15 +154,15 @@ class Cuber2x(object):
 
         #if self.shutdown:
         #   return
-        rotator_pos = 610   
+        rotator_pos = 605  
         
         #level 300 is at hold could be useful, 
-        self.rotator.on_to_position(SpeedDPS(self.flip_speed),rotator_pos)
+        self.rotator.on_for_degrees(SpeedDPS(self.flip_speed),rotator_pos)
         self.rotator.wait_until_not_moving()
 
-        rotator_pos = self.rotator.position = 0
+        #rotator_pos = self.rotator.position = 0
         sleep(0.05)    
-        log.info("%d new value",(self.rotator_pos))
+        log.info("%d new value",(rotator_pos))
 
         transformation = [4, 1, 0, 3, 5, 2]
         self.apply_transformation(transformation)
@@ -170,13 +170,27 @@ class Cuber2x(object):
     def scan(self):
         log.info("scan()")
         self.k = 0
-        
+
+
+        """
+        flip
+        clockwise
+        flip
+        flip
+        flip
+        anti-clockwise
+        flip
+        anti-clockwise
+        flip
+        flip
+        """
+
         #side 0 is scanned
 
         self.flip()
         #side 4 scanned 
 
-        sleep(3)
+        sleep(0.05)
         self.rotate_cube_1()
         
         self.flip()
@@ -188,15 +202,15 @@ class Cuber2x(object):
         self.flip()
         #side 3 scanned
 
-        sleep(3)
+        sleep(0.05)
         self.rotate_cube_3()
 
         self.flip()
         
         #side 5 scanned
         
-        sleep(3)
-        self.rotate_cube_1()
+        sleep(0.05)
+        self.rotate_cube_3()
 
         self.flip()
         

@@ -15,10 +15,10 @@ log = logging.getLogger(__name__)
 
 class Cuber2x(object):
     
-    hold_cube_pos = 200 #arbitrary need to find
+    hold_cube_pos = 210 #arbitrary need to find
     rotate_speed = 400 #adapt
-    flip_speed = 300 #adapt (might need to be slower)
-
+    flip_speed = 210 #adapt (might need to be slower)
+    rotator_pos = 610 # this value will decrement the more it is called in order to maintain accuracy
 
     def __init__(self):
         self.shutdown = False
@@ -39,7 +39,7 @@ class Cuber2x(object):
             x.reset()
 
         log.info("Initialize rotator %s" % self.rotator)
-        #self.rotator.on(SpeedDPS(-50), block=True)
+        #self.rotator.on(SpeedDPS(-50), block=False)
         self.rotator.off()
         self.rotator.reset()
 
@@ -71,10 +71,11 @@ class Cuber2x(object):
         final_pos = 150 * round((self.turntable.position + (395 * direction * nb)) /150.0)
         log.info("rotate_cube() direction %s, nb %s, current_pos %d final_pos %d" % (direction , nb, current_pos, final_pos))
 
-        if self.rotator.position > 35:
-            self.rotator_away()
+        #if self.rotator.position > 35:
+        #    self.rotator_away()
 
         self.turntable.on_to_position(SpeedDPS(Cuber2x.rotate_speed), final_pos)
+        sleep(0.05)
 
         if nb >= 1:
             for i in range(nb):
@@ -84,7 +85,6 @@ class Cuber2x(object):
                     transformation = [0, 2, 3, 4, 1, 5]
                 self.apply_transformation(transformation)
 
-
     def rotate_cube_1(self):
         self.rotate_cube(1,1)
     
@@ -92,7 +92,7 @@ class Cuber2x(object):
         self.rotate_cube(1,2)
     
     def rotate_cube_3(self):
-        self.rotate_cube(-1,1)
+        self.rotate_cube(1,-1)
 
     def rotate_cube_blocked(self, direction, nb):
     
@@ -117,7 +117,7 @@ class Cuber2x(object):
         self.rotate_cube_blocked(1,2)
     
     def rotate_cube_blocked_3(self):
-        self.rotate_cube_blocked(-1,1)
+        self.rotate_cube_blocked(1,-1)
 
     def rotator_hold_cube(self, speed=300):
         current_position = self.rotator.position
@@ -152,13 +152,17 @@ class Cuber2x(object):
         """
         log.info("flip()")
 
+        #if self.shutdown:
+        #   return
+        rotator_pos = 610   
+        
+        #level 300 is at hold could be useful, 
+        self.rotator.on_to_position(SpeedDPS(self.flip_speed),rotator_pos)
+        self.rotator.wait_until_not_moving()
 
-        if self.shutdown:
-            return
-
-
-        self.rotator.on_to_position(SpeedDPS(self.flip_speed), 190)
-        self(0.05)
+        rotator_pos = self.rotator.position = 0
+        sleep(0.05)    
+        log.info("%d new value",(self.rotator_pos))
 
         transformation = [4, 1, 0, 3, 5, 2]
         self.apply_transformation(transformation)
@@ -172,6 +176,7 @@ class Cuber2x(object):
         self.flip()
         #side 4 scanned 
 
+        sleep(3)
         self.rotate_cube_1()
         
         self.flip()
@@ -179,19 +184,22 @@ class Cuber2x(object):
 
         self.flip()
         #side 2 scanned 
-
+        
         self.flip()
         #side 3 scanned
 
-        self.rotate_cube_2()
+        sleep(3)
+        self.rotate_cube_3()
 
         self.flip()
+        
         #side 5 scanned
         
+        sleep(3)
         self.rotate_cube_1()
 
         self.flip()
-
+        
         self.flip()
 
         if self.shutdown:
@@ -212,12 +220,10 @@ class Cuber2x(object):
         }.get(position, None)
 
         for a in actions:
-
             if self.shutdown:
                 break
 
             getattr(self, a)()
-
 
 
 if __name__== '__main__':
@@ -235,11 +241,9 @@ if __name__== '__main__':
     try:
         
         #x2Cube.rotator_hold_cube(150)
-        x2Cube.rotate_cube_1()
-        x2Cube.rotate_cube_3()
         #x2Cube.rotator_away(150)
-
-        #x2Cube.scan()
+        
+        x2Cube.scan()
         x2Cube.shutdown_robot()
 
     
